@@ -7,9 +7,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
-from .models import Cities, Activities
+from .models import Cities, Activities, Elders
 from .serializers import (
-    CitiesSerializer, ActivitiesSerializer
+    CitiesSerializer, ActivitiesSerializer, ElderSerializer
 )
 
 
@@ -30,4 +30,7 @@ class ActivitiesViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
 
+class ElderViewSet(viewsets.ModelViewSet):
+    queryset = Elders.objects.all()
+    serializer_class = ElderSerializer
 
