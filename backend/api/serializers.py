@@ -14,13 +14,18 @@ class ActivitiesSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 class CustomUserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    
     class Meta:
         model = CustomUser
-        fields = ['id','email','first_name','last_name','role','is_active','is_staff']
+        fields = ['id','email','first_name','last_name','role','is_active','is_staff', 'password']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
 
 class ElderSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer()
-    city = CitiesSerializer
+    city = serializers.PrimaryKeyRelatedField(queryset=Cities.objects.all())
     age = serializers.ReadOnlyField()
 
     class Meta:
@@ -29,6 +34,8 @@ class ElderSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        user = CustomUser.objects.create_user(**user_data)
-        elder = Elders.objects.create(user = user, **validated_data)
+        password = user_data.pop('password', None)
+        
+        user = CustomUser.objects.create_user(password=password, **user_data)
+        elder = Elders.objects.create(user=user, **validated_data)
         return elder

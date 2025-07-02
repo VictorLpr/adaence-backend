@@ -17,7 +17,7 @@ class CitiesViewSet(viewsets.ReadOnlyModelViewSet):
     """API pour les villes - lecture seule"""
     queryset = Cities.objects.all().order_by('title')
     serializer_class = CitiesSerializer
-    permission_classes = [AllowAny]  # Accessible sans authentification
+    permission_classes = [AllowAny]  
     filter_backends = [filters.SearchFilter]
     search_fields = ['title', 'zipcode']
 
@@ -33,4 +33,6 @@ class ActivitiesViewSet(viewsets.ModelViewSet):
 class ElderViewSet(viewsets.ModelViewSet):
     queryset = Elders.objects.all()
     serializer_class = ElderSerializer
+    permission_classes = [AllowAny]  
+
 
