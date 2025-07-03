@@ -4,11 +4,11 @@ from django.contrib.auth.models import Group
 from django.conf import settings
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def ajouter_utilisateur_au_groupe(sender, instance, created, **kwargs):
+def add_user_to_group(sender, instance, created, **kwargs):
     if created and instance.role == 'elder':
-        groupe, _ = Group.objects.get_or_create(name='elder')
-        instance.groups.add(groupe)
+        group, _ = Group.objects.get_or_create(name='elder')
+        instance.groups.add(group)
 
     if created and instance.role == 'volunteer':
-        groupe, _ = Group.objects.get_or_create(name='volunteer')
-        instance.groups.add(groupe)
+        group, _ = Group.objects.get_or_create(name='volunteer')
+        instance.groups.add(group)
