@@ -18,15 +18,14 @@ class CustomUserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CustomUser
-        fields = ['id','email','first_name','last_name','role','is_active','is_staff', 'password']
+        fields = ['id','email','first_name','last_name','role', 'password']
         extra_kwargs = {
             'password': {'write_only': True}
         }
 
 class ElderSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer()
-    city = serializers.PrimaryKeyRelatedField(queryset=Cities.objects.all())
-    city_detail = CitiesSerializer(source='city', read_only=True)
+    city = CitiesSerializer()
     age = serializers.ReadOnlyField()
 
     class Meta:
@@ -35,16 +34,18 @@ class ElderSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
+        city_data = validated_data.pop('city')
+
         password = user_data.pop('password', None)
         
         user = CustomUser.objects.create_user(password=password, **user_data)
-        elder = Elders.objects.create(user=user, **validated_data)
+        city = Cities.objects.get_or_create(**city_data)
+        elder = Elders.objects.create(user=user,city=city, **validated_data)
         return elder
 
 class VolunteerSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer()
-    city = serializers.PrimaryKeyRelatedField(queryset=Cities.objects.all())
-    city_detail = CitiesSerializer(source='city', read_only=True)
+    city = CitiesSerializer()
 
     class Meta:
         model = Volunteers
@@ -52,9 +53,12 @@ class VolunteerSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
+        city_data = validated_data.pop('city')
         password = user_data.pop('password', None)
+
         user = CustomUser.objects.create_user(password=password, **user_data)
-        volunteer = Volunteers.objects.create(user=user, **validated_data)
+        city = Cities.objects.get_or_create(**city_data)
+        volunteer = Volunteers.objects.create(user=user, city=city, **validated_data)
         return volunteer
 
 

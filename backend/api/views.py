@@ -10,6 +10,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth import authenticate
+
+from .permissions import IsOwner
 from .models import Cities, Activities, Elders, Volunteers, Appointments
 from .serializers import (
     CitiesSerializer, ActivitiesSerializer, ElderSerializer, VolunteerSerializer, AppointmentSerializer
@@ -35,18 +37,46 @@ class ActivitiesViewSet(viewsets.ModelViewSet):
     search_fields = ['name']
 
 class ElderViewSet(viewsets.ModelViewSet):
-    queryset = Elders.objects.all()
     serializer_class = ElderSerializer
-    permission_classes = [AllowAny]  
+    permission_classes = [IsOwner]  
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['city']  
+    filterset_fields = {
+        'city__title': ['exact', 'icontains'],
+    }
+    def get_queryset(self):
+        user = self.request.user
+
+        if not user.is_authenticated:
+            return Elders.objects.none()
+
+        if user.role == 'elder':
+            return Elders.objects.filter(user=user)
+        
+        if user.role == 'volunteer':
+            return Elders.objects.all()
+        
+        return Elders.objects.all()
 
 class VolunteerViewSet(viewsets.ModelViewSet):
-    queryset = Volunteers.objects.all()
     serializer_class = VolunteerSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsOwner]
     filter_backends = [DjangoFilterBackend]
-    filterset_files = ['city']
+    filterset_fields = {      
+        'city__title': ['exact', 'icontains'],
+    }
+    def get_queryset(self):
+        user = self.request.user
+
+        if not user.is_authenticated:
+            return Volunteers.objects.none()
+
+        if user.role == 'volunteer':
+            return Volunteers.objects.filter(user=user)
+        
+        if user.role == 'elder':
+            return Volunteers.objects.all()
+        
+        return Volunteers.objects.all()
 
 class AppointmentViewSet(viewsets.ModelViewSet):
     serializer_class = AppointmentSerializer
