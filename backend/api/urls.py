@@ -1,12 +1,14 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken.views import obtain_auth_token
-from .views import CitiesViewSet, ActivitiesViewSet, ElderViewSet, LoginView
+from .views import CitiesViewSet, ActivitiesViewSet, ElderViewSet, LoginView, VolunteerViewSet, AppointmentViewSet
 
 router = DefaultRouter()
 router.register(r'cities', CitiesViewSet, basename='cities')
 router.register(r'activities', ActivitiesViewSet, basename='activities')
 router.register(r'elders', ElderViewSet, basename='elders')
+router.register(r'volunteers', VolunteerViewSet, basename='volunteers')
+router.register(r'appointments', AppointmentViewSet, basename='appointments')
 
 urlpatterns = [
     # API endpoints

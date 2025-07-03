@@ -8,10 +8,11 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
+from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth import authenticate
-from .models import Cities, Activities, Elders
+from .models import Cities, Activities, Elders, Volunteers, Appointments
 from .serializers import (
-    CitiesSerializer, ActivitiesSerializer, ElderSerializer
+    CitiesSerializer, ActivitiesSerializer, ElderSerializer, VolunteerSerializer, AppointmentSerializer
 )
 
 
@@ -37,6 +38,34 @@ class ElderViewSet(viewsets.ModelViewSet):
     queryset = Elders.objects.all()
     serializer_class = ElderSerializer
     permission_classes = [AllowAny]  
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['city']  
+
+class VolunteerViewSet(viewsets.ModelViewSet):
+    queryset = Volunteers.objects.all()
+    serializer_class = VolunteerSerializer
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_files = ['city']
+
+class AppointmentViewSet(viewsets.ModelViewSet):
+    serializer_class = AppointmentSerializer
+    
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.role == 'volunteer':
+            return Appointments.objects.filter(volunteer__user=user)
+        elif user.role == 'elder':
+            return Appointments.objects.filter(volunteer__user=user)
+        
+        return Appointments.objects.all()
+    
+    def perform_create(self, serializer):
+        serializer.save()
+    
+
+
 
 
 class LoginView(APIView):
