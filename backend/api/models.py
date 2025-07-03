@@ -46,7 +46,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 class Cities(models.Model):
     title = models.CharField(max_length=255)
-    zipcode = models.IntegerField(blank=True, null=True)
+    zipcode = models.CharField(max_length=255)
     lat = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     lng = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     class Meta:

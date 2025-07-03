@@ -30,7 +30,7 @@ class ElderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Elders
-        fields = ['id', 'user', 'job', 'date_of_birth', 'city','city_detail', 'description', 'phone_number', 'age']
+        fields = ['id', 'user', 'job', 'date_of_birth', 'city', 'description', 'phone_number', 'age']
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
@@ -39,7 +39,7 @@ class ElderSerializer(serializers.ModelSerializer):
         password = user_data.pop('password', None)
         
         user = CustomUser.objects.create_user(password=password, **user_data)
-        city = Cities.objects.get_or_create(**city_data)
+        city, _ = Cities.objects.get_or_create(**city_data)
         elder = Elders.objects.create(user=user,city=city, **validated_data)
         return elder
 
@@ -49,7 +49,7 @@ class VolunteerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Volunteers
-        fields = ['id', 'user', 'city','city_detail', 'phone_number', 'url_image']
+        fields = ['id', 'user', 'city', 'phone_number', 'url_image']
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
@@ -57,7 +57,7 @@ class VolunteerSerializer(serializers.ModelSerializer):
         password = user_data.pop('password', None)
 
         user = CustomUser.objects.create_user(password=password, **user_data)
-        city = Cities.objects.get_or_create(**city_data)
+        city, _ = Cities.objects.get_or_create(**city_data)
         volunteer = Volunteers.objects.create(user=user, city=city, **validated_data)
         return volunteer
 
