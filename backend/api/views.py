@@ -36,7 +36,7 @@ class ActivitiesViewSet(viewsets.ModelViewSet):
 class ElderViewSet(viewsets.ModelViewSet):
     queryset = Elders.objects.all()
     serializer_class = ElderSerializer
-    permission_classes = [IsAuthenticated]  
+    permission_classes = [AllowAny]  
 
 
 class LoginView(APIView):
@@ -61,7 +61,7 @@ class LoginView(APIView):
         response = Response({
             'message': 'Connexion réussie',
             'user': {
-                'id': user.id,
+                'id': user.id, 
                 'email': user.email,
             }
         })

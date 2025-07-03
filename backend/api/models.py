@@ -14,6 +14,7 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('role', 'superuser')
         return self.create_user(email, password, **extra_fields)
     
 class CustomUser(AbstractBaseUser, PermissionsMixin):
@@ -24,6 +25,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = (
         ('elder', 'Elder'),
         ('volunteer', 'Volunteer'),
+        ('superuser', 'Superuser')
+        
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
 
