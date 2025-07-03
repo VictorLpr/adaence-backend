@@ -26,11 +26,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
 class ElderSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer()
     city = serializers.PrimaryKeyRelatedField(queryset=Cities.objects.all())
+    city_detail = CitiesSerializer(source='city', read_only=True)
     age = serializers.ReadOnlyField()
 
     class Meta:
         model = Elders
-        fields = ['id', 'user', 'job', 'date_of_birth', 'city', 'description', 'phone_number', 'age']
+        fields = ['id', 'user', 'job', 'date_of_birth', 'city','city_detail', 'description', 'phone_number', 'age']
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
@@ -39,3 +40,49 @@ class ElderSerializer(serializers.ModelSerializer):
         user = CustomUser.objects.create_user(password=password, **user_data)
         elder = Elders.objects.create(user=user, **validated_data)
         return elder
+
+class VolunteerSerializer(serializers.ModelSerializer):
+    user = CustomUserSerializer()
+    city = serializers.PrimaryKeyRelatedField(queryset=Cities.objects.all())
+    city_detail = CitiesSerializer(source='city', read_only=True)
+
+    class Meta:
+        model = Volunteers
+        fields = ['id', 'user', 'city','city_detail', 'phone_number', 'url_image']
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        password = user_data.pop('password', None)
+        user = CustomUser.objects.create_user(password=password, **user_data)
+        volunteer = Volunteers.objects.create(user=user, **validated_data)
+        return volunteer
+
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    activity = serializers.PrimaryKeyRelatedField(queryset=Activities.objects.all())
+    elder = serializers.PrimaryKeyRelatedField(queryset=Elders.objects.all())
+
+    volunteer = VolunteerSerializer(read_only=True)
+
+    activity_detail = ActivitiesSerializer(source='activity', read_only=True)
+    elder_detail = ElderSerializer(source='elder', read_only=True)
+    volunteer_detail = VolunteerSerializer(source='volunteer', read_only=True)
+
+    class Meta:
+        model = Appointments
+        fields = ['id', 'date', 'activity', 'elder', 'volunteer', 'activity_detail', 'elder_detail', 'volunteer_detail']
+
+
+    
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            raise serializers.ValidationError("Authentication required")
+
+        try:
+            volunteer = request.user.volunteers
+        except Volunteers.DoesNotExist:
+            raise serializers.ValidationError("Volunteer profile not found for the user")
+
+        appointment = Appointments.objects.create(volunteer=volunteer, **validated_data)
+        return appointment
