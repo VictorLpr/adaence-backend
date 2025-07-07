@@ -87,7 +87,7 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         if user.role == 'volunteer':
             return Appointments.objects.filter(volunteer__user=user)
         elif user.role == 'elder':
-            return Appointments.objects.filter(volunteer__user=user)
+            return Appointments.objects.filter(elder__user=user)
         
         return Appointments.objects.all()
     
@@ -120,7 +120,8 @@ class LoginView(APIView):
         response = Response({
             'message': 'Connexion réussie',
             'user': {
-                'id': user.id, 
+                'id': user.id,
+                'role' : user.role, 
                 'email': user.email,
             }
         })
@@ -129,7 +130,7 @@ class LoginView(APIView):
                 token.key,
                 max_age=3600,
                 httponly=True,
-                secure=True,  # HTTPS uniquement
+                secure=False,  # HTTPS uniquement
                 samesite='Strict'
             )
         return response
