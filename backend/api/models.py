@@ -74,7 +74,7 @@ class Elders(models.Model):
     date_of_birth = models.DateField(blank=True, null=True)
     city = models.ForeignKey(Cities, models.DO_NOTHING)
     description = models.TextField(blank=True, null=True)
-    image_url = models.URLField(blank=True, null=True)
+    image_url = models.CharField(max_length=255, blank=True, null=True)
     phone_number = models.CharField(max_length=20)
 
     def __str__(self):
@@ -95,7 +95,7 @@ class Volunteers(models.Model):
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
     city = models.ForeignKey(Cities, models.DO_NOTHING)
     phone_number = models.CharField(max_length=20)
-    url_image = models.URLField(blank=True, null=True)
+    url_image = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return f"Volunteer: {self.user.get_full_name()}"
