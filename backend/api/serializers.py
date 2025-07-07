@@ -35,6 +35,7 @@ class ElderSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user_data = validated_data.pop('user')
         city_data = validated_data.pop('city')
+    
 
         password = user_data.pop('password', None)
         
@@ -42,6 +43,33 @@ class ElderSerializer(serializers.ModelSerializer):
         city, _ = Cities.objects.get_or_create(**city_data)
         elder = Elders.objects.create(user=user,city=city, **validated_data)
         return elder
+    
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', None)
+        city_data = validated_data.pop('city', None)
+
+        if user_data:
+            user = instance.user
+            password = user_data.pop('password', None)
+
+            for attr, value in user_data.items():
+                setattr(user, attr, value)
+
+            if password:
+                user.set_password(password)
+
+            user.save()
+
+        if city_data:
+            city, _ = Cities.objects.get_or_create(**city_data)
+            instance.city = city
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
 
 class VolunteerSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer()
@@ -60,6 +88,32 @@ class VolunteerSerializer(serializers.ModelSerializer):
         city, _ = Cities.objects.get_or_create(**city_data)
         volunteer = Volunteers.objects.create(user=user, city=city, **validated_data)
         return volunteer
+    
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', None)
+        city_data = validated_data.pop('city', None)
+
+        if user_data:
+            user = instance.user
+            password = user_data.pop('password', None)
+
+            for attr, value in user_data.items():
+                setattr(user, attr, value)
+
+            if password:
+                user.set_password(password)
+
+            user.save()
+
+        if city_data:
+            city, _ = Cities.objects.get_or_create(**city_data)
+            instance.city = city
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
