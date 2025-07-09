@@ -30,7 +30,7 @@ class ElderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Elders
-        fields = ['id', 'user', 'job', 'date_of_birth', 'city', 'description', 'phone_number', 'age']
+        fields = ['id', 'user', 'job', 'date_of_birth', 'city', 'description','image_url', 'phone_number', 'age']
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
