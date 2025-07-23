@@ -1,8 +1,12 @@
 {
+  "version": 2,
   "builds": [
     {
       "src": "backend/backend/wsgi.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb"
+      }
     }
   ],
   "routes": [
@@ -10,5 +14,8 @@
       "src": "/(.*)",
       "dest": "backend/backend/wsgi.py"
     }
-  ]
+  ],
+  "env": {
+    "PYTHONPATH": "/var/task"
+  }
 }
